@@ -1,0 +1,261 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>CSYE7374 Special Topics- Machine Translation</title>
+  <script src="../../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../../elements/codelab.html">
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <style is="custom-style">
+    body {
+      font-family: "Roboto",sans-serif;
+      background: var(--google-codelab-background, #F8F9FA);
+    }
+  </style>
+  
+</head>
+<body unresolved class="fullbleed">
+
+  <google-codelab title="CSYE7374 Special Topics- Machine Translation"
+                  environment="web"
+                  feedback-link="https://github.com/Manasa9391/Neural-Machine-Translation/issues">
+    
+      <google-codelab-step label="Introduction" duration="0">
+        <p>Machine translation uses software to translate text or speech from one language to another. Machine translation engine performs simple substitution of words in one language for words in another, but that alone doesn&#39;t usually produce the highest quality translation of a text. For more accurate translation, recognition of whole phrases and their closest counterparts in the target language is needed.</p>
+<p>The neural translation model is an encoder-decoder recurrent neural network.  It is comprised of an encoder that reads a variable length input sequence and a decoder that predicts a variable length output sequence.</p>
+<p>Although big players like Google Translate and Microsoft Translator offer near-accurate, real-time translations, some &#34;domains&#34; or industries call for highly-specific training data related to the particular domain in order to improve accuracy and relevancy.</p>
+<h2><strong>What is the outcome of Neural Machine Translation?</strong></h2>
+<p>The current use case for this  experiment is translation from  English to French:</p>
+<ul>
+<li>Each input and output sequence must be encoded to integers and padded to the maximum phrase length. This is because we will use a word embedding for the input sequences and one hot encode the output sequences.</li>
+</ul>
+<h2><strong>What you will build</strong></h2>
+<table>
+<tr><td colspan="1" rowspan="1"><p>In this experiment, you&#39;re going to build a LSTM Sequence to Sequence model  </p>
+<p>Attention Model</p>
+</td><td colspan="1" rowspan="1"><p>English:</p>
+<p>‘This is a model&#39;</p>
+<p>French:</p>
+<p>C&#39;est un modèle</p>
+<p>English:</p>
+<p>‘This is a model&#39;</p>
+<p>French:</p>
+<p>C&#39;est un modèle</p>
+</td></tr>
+</table>
+<h2 class="checklist"><strong>What you&#39;ll learn</strong></h2>
+<ul class="checklist">
+<li>LSTM architecture </li>
+<li>Attention Model</li>
+</ul>
+<h2><strong>What you&#39;ll need</strong></h2>
+<ul>
+<li>Python IDE( Jupyter notebook, Spyder)</li>
+<li>Compute machine with capability to run 600mb files</li>
+<li>Amazon management console to instantiate a sagemaker instance or Google colab</li>
+<li>Download code</li>
+<li>A text editor</li>
+<li>Basic knowledge of Neural networks, LSTM, Sequence to sequence model, Attention</li>
+<li>Supporting libraries keras on tensorflow and stand alone tensorflow</li>
+</ul>
+<p>Below are the libraries necessary to be installed</p>
+<p><img style="max-width: 502.00px" src="img\d4f9c4b5e55eceb8.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Project Goals" duration="0">
+        <h2><strong>What is the project goal?</strong></h2>
+<p>The project goal is to design an efficient and relevant model to convert English sentences to equivalent French.</p>
+<h2><strong>Project Pipelining </strong></h2>
+<p>1. Data Preprocessing</p>
+<p>2. Study of different architectures of LSTM and train different models</p>
+<p>3.Evaluate the trained models and select the best model for translation from English to French.</p>
+<h2><strong>Data</strong></h2>
+<p><strong>Europarl Machine Translation Dataset</strong></p>
+<p>Europarl is a standard dataset used for statistical machine translation, and more recently, neural machine translation.</p>
+<p>Link: <a href="http://www.statmt.org/europarl/" target="_blank">http://www.statmt.org/europarl/</a></p>
+<p>The data is also part of this project and can be downloaded from the given <a href="https://github.com/Manasa9391/Neural-Machine-Translation/tree/master/DATASET" target="_blank">Github </a>link</p>
+<p>Using this dataset we would be implementing different models and chose the best model that can convert the english sentences to french.</p>
+<h2><strong>Data  Preprocessing</strong></h2>
+<p>Steps:</p>
+<p>1.        Tokenizing text by whitespace</p>
+<p>2.        Normalizing case to lowercase.</p>
+<p>3.        Removing punctuation from each word.</p>
+<p>4.        Removing non-printable characters.</p>
+<p>5.        Converting French characters to Latin characters</p>
+<p>6.        Removing words that contain non-alphabetic characters.</p>
+<p>7.        Converting text to integer sequence</p>
+<p>8.        Padding the sequence to maximum length.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Getting set up" duration="0">
+        <h2><strong>Download the Code</strong></h2>
+<p>Click the following link to download all the code for this codelab:</p>
+<p><a href="https://github.com/Manasa9391/Neural-Machine-Translation" target="_blank"><paper-button class="colored" raised>https://github.com/Manasa9391/Neural-Machine-Translation</paper-button></a></p>
+<p>Clone the github repository mentioned above. This will unpack a root folder (Neural-Machine-Translation-master), which contains details and supported notebooks for each step of this codelab, along with all of the resources you will need.</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Architecture of the Model" duration="0">
+        <h2><strong>Architecture</strong></h2>
+<p><strong>1.LSTM based Sequence to Sequence learning:</strong></p>
+<p>A typical sequence to sequence model has two parts – an encoder and a decoder. </p>
+<p>Both the parts are practically two different neural network models combined into one giant network. </p>
+<p>The graph of the model architecture is mentioned below. The model input is English and it has to predict the output.</p>
+<p><img style="max-width: 377.50px" src="img\c435a8399543b4ef.png"> </p>
+<p>The encoder is responsible for outputting a fixed-length encoding of the input English sequence, and the decoder is responsible for predicting the output sequence.</p>
+<p>The task of an encoder network is to understand the input sequence and create a smaller dimensional representation of it. This representation is then forwarded to a decoder network which generates a sequence of its own that represents the output. In seq2seq problems we there are 2 phases, one is training the model, and another is inferencing. In training the model, we train the network with a fixed length. The length of sentence in English and its corresponding in French is not the same. It is not possible to train the model with variables inputs and outputs since we have to change the model graph for every sentence.  In inference it is not necessary. Once we get the encoding states from the encoder, we can take those states and generate the sentence. The generation process continues till the model predicts the end of sentence.</p>
+<h2><strong>Attention</strong></h2>
+<p>The following diagram shows that each input words is assigned a weight by the attention mechanism which is then used by the decoder to predict the next word in the sentence.</p>
+<p>The input is put through an encoder model which gives us the encoder output of shape (batch_size, max_length, hidden_size) and the encoder hidden state of shape (batch_size, hidden_size).</p>
+<p>The attention model requires access to the output from the encoder for each input time step. </p>
+<p>The decoder outputs one value at a time, which is passed on to perhaps more layers before finally outputting a prediction (y) for the current output time step.</p>
+<p>The alignment model scores (e) how well each encoded input (h) matches the current output of the decoder (s).</p>
+<p>The calculation of the score requires the output from the decoder from the previous output time step, e.g. s(t-1).</p>
+<p>When scoring the very first output for the decoder, this will be 0.</p>
+<p>Scoring is performed using a function</p>
+<p>These scores are scalar values. Next the scores are normalized using a softmax function.</p>
+<p>The normalization of the scores allows them to be treated like probabilities, indicating the likelihood of each encoded input time step (annotation) being relevant to the current output time step.</p>
+<p>These normalized scores are called attention weights.</p>
+<p>Next, each encoder output is multiplied by the attention weights to produce a new attended context vector from which the current output time step can be decoded.</p>
+<p>Decoding is then performed as per the Encoder-Decoder model, although in this case using the attended context vector for the current time step.</p>
+<p>This may be fed into additional layers before ultimately exiting the model as a prediction for the time step.</p>
+<p><img style="max-width: 557.00px" src="img\ef3f52a9fcb65d5c.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Implementation Details" duration="0">
+        <p> The models are on the Github repository under the folder Models.</p>
+<p><a href="https://github.com/Manasa9391/Neural-Machine-Translation/tree/master/Models/LSTM" target="_blank">LSTM</a></p>
+<p><a href="https://github.com/Manasa9391/Neural-Machine-Translation/tree/master/Models/Attention" target="_blank">Attention</a></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Evaluation" duration="0">
+        <h2>  The model is being evaluated on the prediction of the actual data which could be found in <a href="https://github.com/Manasa9391/Neural-Machine-Translation/tree/master/DATASET" target="_blank">Github</a> .</h2>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Analysis of Models" duration="0">
+        <p>We had started with Sequence to Sequence LSTM model and then we proceeded with the Attention model. We had tried different variations of Sequence to Sequence LSTM and Attention models.</p>
+<ol type="1" start="1">
+<li><strong>Attention:</strong></li>
+</ol>
+<p>We ran three different configuration for the attention model<br></p>
+<p>1.Input size:1000,epochs=25</p>
+<p><img style="max-width: 602.00px" src="img\c8cd0433d1d38ce5.png"></p>
+<p><img style="max-width: 602.00px" src="img\a4bac82adb10dbf9.png"></p>
+<p><img style="max-width: 602.00px" src="img\5df09efd0ba3be5b.png"></p>
+<p>2.Input size:1000,epochs=50</p>
+<p><img style="max-width: 602.00px" src="img\1597607568f94016.png"></p>
+<p><img style="max-width: 602.00px" src="img\5233ca7d169b3b87.png"></p>
+<p>3.Input size=2000,epochs=25</p>
+<p><img style="max-width: 602.00px" src="img\e8a39efda0033704.png"></p>
+<p><img style="max-width: 602.00px" src="img\c8cd0433d1d38ce5.png"></p>
+<ol type="1" start="2">
+<li><strong>Sequence to Sequence :</strong></li>
+</ol>
+<p><strong>a. Input size: 9984,  epoch: 100</strong></p>
+<p><img style="max-width: 602.00px" src="img\134c8588d8796ae0.png"></p>
+<p><img style="max-width: 451.00px" src="img\4676522c94391712.png"></p>
+<p><strong>b. Input size:15000 , epoch:20</strong></p>
+<p><img style="max-width: 602.00px" src="img\e975cdebb9e01256.png"></p>
+<p><img style="max-width: 399.00px" src="img\8d46c526c413f23c.png"></p>
+<p><strong>c.Input size: 25000,  epoch:10</strong></p>
+<p><img style="max-width: 602.00px" src="img\3ac37cd9dc907022.png"></p>
+<p><img style="max-width: 461.00px" src="img\e36ac1f6ec1c0701.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Details on how to run the model" duration="0">
+        <ol type="1" start="1">
+<li>Clone or  Download the repository from the <a href="https://github.com/Manasa9391/Neural-Machine-Translation" target="_blank">Github</a> link</li>
+<li>Install all the dependencies of the project</li>
+<li>Download the data from <a href="https://github.com/Manasa9391/Neural-Machine-Translation" target="_blank">Github</a>  link</li>
+<li>Preferably run the model on AWS sage maker or google colab</li>
+</ol>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Summary of the Experiments" duration="0">
+        <table>
+<tr><td colspan="1" rowspan="1"><p>Model</p>
+</td><td colspan="1" rowspan="1"><p>10 Epochs/Samples</p>
+</td><td colspan="1" rowspan="1"><p>Training time/epoch</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>LSTM(Sequence to Sequence)</p>
+</td><td colspan="1" rowspan="1"><p>20/15000</p>
+</td><td colspan="1" rowspan="1"><p>16 minutes</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>LSTM(Sequence To Sequence)</p>
+</td><td colspan="1" rowspan="1"><p>10/20000</p>
+</td><td colspan="1" rowspan="1"><p>10 minutes</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>LSTM(Sequence To Sequence)</p>
+</td><td colspan="1" rowspan="1"><p>10/25000</p>
+</td><td colspan="1" rowspan="1"><p>10 minutes</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Attention Model 1</p>
+</td><td colspan="1" rowspan="1"><p>100/1000</p>
+</td><td colspan="1" rowspan="1"><p>6minutes</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Attention Model 2</p>
+</td><td colspan="1" rowspan="1"><p>50/1000</p>
+</td><td colspan="1" rowspan="1"><p>6.1minutes</p>
+</td></tr>
+<tr><td colspan="1" rowspan="1"><p>Attention Model 3</p>
+</td><td colspan="1" rowspan="1"><p>25/2000</p>
+</td><td colspan="1" rowspan="1"><p>14 minutes</p>
+</td></tr>
+</table>
+<h2><strong>Conclusion: </strong></h2>
+<p>In the experiments conducted to find out best model for translation, we found out that Attention model with 1000 input size and 50 epoch has given the least loss and reasonably good translation from English to French.</p>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-49880327-14', 'auto');
+
+    (function() {
+      var gaCodelab = '';
+      if (gaCodelab) {
+        ga('create', gaCodelab, 'auto', {name: 'codelab'});
+      }
+
+      var gaView;
+      var parts = location.search.substring(1).split('&');
+      for (var i = 0; i < parts.length; i++) {
+        var param = parts[i].split('=');
+        if (param[0] === 'viewga') {
+          gaView = param[1];
+          break;
+        }
+      }
+      if (gaView && gaView !== gaCodelab) {
+        ga('create', gaView, 'auto', {name: 'view'});
+      }
+    })();
+  </script>
+
+</body>
+</html>
